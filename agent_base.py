@@ -15,6 +15,18 @@ class LanguageModelAgent:
         # This will be different for different agent class. Inherit and change this, in the end, call self._generate_response after handling the query.
         raise NotImplementedError()
 
+class CohereModelAgent:
+    def __init__(self, api_key):
+        self.co = cohere.Client(api_key)  ## Enter your API Key here.
+    
+    def _generate_response(self, prompt):
+        response = self.co.generate(prompt=prompt)
+        return response.generations[0].text 
+
+    def process_query(self, query):
+        # TODO: Might change this to something else.
+        return self._generate_response(query)
+
 # Some agents which we'll use for our experiments.
 
 class BartAgent(LanguageModelAgent):
