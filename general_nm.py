@@ -1,14 +1,12 @@
 from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
+from agents_base import LanguageModelAgent, CohereModelAgent  # For testing with Cohere's command model
 
-# Load models and tokenizers
-models = [
-    AutoModelForSeq2SeqLM.from_pretrained(model_name) for model_name in ["model1", "model2", ...]  # Replace with your models
-]
-tokenizers = [AutoTokenizer.from_pretrained(model_name) for model_name in models]
+# Load models and tokenizers(for os_models)
+agents = [LanguageModelAgent(model_name) for model_name in ["model_1", "model_2"]]  ## This is the abstraction.
 
 def debate_round(prompt, agents):
     responses = []
-    for agent, model, tokenizer in zip(agents, models, tokenizers):
+    for agent in agents:
         response = agent.generate_response(prompt)
         responses.append(response)
 
@@ -20,17 +18,16 @@ def vote_on_consensus(candidates):
     for candidate in candidates:
         counts[candidate] = counts.get(candidate, 0) + 1
 
-    # Identify the majority vote (or threshold, e.g., 2/3 of agents)
+    # Identify the majority vote.
     max_count = max(counts.values())
     if max_count >= len(agents) // 2 + 1:  # Check for majority or set your threshold
         consensus = [candidate for candidate, count in counts.items() if count == max_count]
         return consensus[0]  # Pick the first consensus candidate
-    else:
-        return None  # No consensus reached
+    return None  # No consensus reached
 
 def debate(initial_prompt, max_rounds=5):
+    # General debate. Can change the max_rounds for testing. 
     prompt = initial_prompt
-    agents = models  # Use all models as agents
 
     for round_num in range(max_rounds):
         responses = debate_round(prompt, agents)
